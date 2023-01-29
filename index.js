@@ -14,7 +14,26 @@ const uri = `mongodb+srv://${process.env.POWER_HACK_DB_USER}:${process.env.POWER
 console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+async function run() {
 
+    const billingsCollection = client.db('powerHackDB').collection('billings');
+
+    try {
+
+        app.post('/add-billing', async (req, res) => {
+            const billing = req.body;
+            const result = await billingsCollection.insertOne(billing);
+            res.send(result);
+        })
+
+
+    }
+    finally {
+
+    }
+}
+
+run().catch(error => console.log(error));
 
 app.get('/', (req, res) => {
     res.send('Power Hack server is runing.');
