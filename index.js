@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -20,9 +20,39 @@ async function run() {
 
     try {
 
+        app.get('/billing-list', async (req, res) => {
+            const query = {};
+            const result = await billingsCollection.find(query).toArray();
+            res.send(result);
+        });
+
         app.post('/add-billing', async (req, res) => {
             const billing = req.body;
             const result = await billingsCollection.insertOne(billing);
+            res.send(result);
+        });
+
+        app.delete('/delete-billing/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await billingsCollection.deleteOne(query);
+            res.send(result);
+        });
+
+        app.put('/update-billing/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    name: req.body.name,
+                    email: req.body.email,
+                    address: req.body.address,
+                    phone: req.body.phone,
+                    paidAamount: req.body.paidAamount
+                }
+            };
+            const result = await movies.updateOne(filter, updateDoc, options);
             res.send(result);
         })
 
